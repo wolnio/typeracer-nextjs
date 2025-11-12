@@ -3,10 +3,19 @@ import { Card, Flex, Separator, Box, Progress, Text } from "@radix-ui/themes";
 
 interface TimerProps {
   timeRemaining: number;
+  totalKeystrokes: number;
+  correctKeystrokes: number;
 }
 
-export function Timer({ timeRemaining }: TimerProps) {
+export function Timer({
+  timeRemaining,
+  totalKeystrokes,
+  correctKeystrokes,
+}: TimerProps) {
   const isUrgent = timeRemaining <= 10;
+
+  const realAccuracy =
+    totalKeystrokes > 0 ? correctKeystrokes / totalKeystrokes : 0;
 
   return (
     <Card size="3">
@@ -52,7 +61,7 @@ export function Timer({ timeRemaining }: TimerProps) {
               Accuracy
             </Text>
             <Text size="9" weight="bold" className="text-green-600">
-              100%
+              {(realAccuracy * 100).toFixed(0)}%
             </Text>
           </Flex>
         </Flex>

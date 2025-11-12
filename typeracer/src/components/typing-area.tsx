@@ -2,12 +2,47 @@
 
 import { useGameStore } from "@/utils/store";
 import { Card, Flex, TextArea, Text } from "@radix-ui/themes";
+import { useEffect, useRef, useState } from "react";
 
-export function TypingArea() {
-  const { currentInput, setCurrentInput } = useGameStore();
+interface TypingAreaProps {
+  setTotalKeyStrokes: React.Dispatch<React.SetStateAction<number>>;
+  setCorrectKeyStrokes: React.Dispatch<React.SetStateAction<number>>;
+}
+
+export function TypingArea({
+  setTotalKeyStrokes,
+  setCorrectKeyStrokes,
+}: TypingAreaProps) {
+  const { currentInput, currentRound, setCurrentInput } = useGameStore();
+
+  const previousInputRef = useRef("");
+
+  useEffect(() => {
+    setTotalKeyStrokes(0);
+    setCorrectKeyStrokes(0);
+    previousInputRef.current = "";
+  }, [currentRound, setCorrectKeyStrokes, setTotalKeyStrokes]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCurrentInput(e.target.value);
+    const currentValue = e.target.value;
+    const previousValue = previousInputRef.current;
+
+    console.log("INPUT CHANGE", { currentValue, previousValue });
+
+    if (currentValue.length > previousValue.length) {
+      const index = currentValue.length - 1;
+      const typedChar = currentValue[index];
+      const expectedChar = currentRound?.sentence[index];
+      console.log("TYPED CHAR", { typedChar, expectedChar });
+
+      if (typedChar === expectedChar) {
+        setCorrectKeyStrokes((prev) => prev + 1);
+      }
+    }
+
+    setTotalKeyStrokes((prev) => prev + 1);
+    setCurrentInput(currentValue);
+    previousInputRef.current = currentValue;
   };
 
   const handlePaste = (e: React.ClipboardEvent) => {
