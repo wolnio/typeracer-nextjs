@@ -1,13 +1,13 @@
 "use client";
 
+import { useGameStore } from "@/utils/store";
 import { Card, Flex, TextArea, Text } from "@radix-ui/themes";
-import { useState } from "react";
 
 export function TypingArea() {
-  const [inputValue, setInputValue] = useState("");
+  const { currentInput, setCurrentInput } = useGameStore();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInputValue(e.target.value);
+    setCurrentInput(e.target.value);
   };
 
   const handlePaste = (e: React.ClipboardEvent) => {
@@ -32,7 +32,7 @@ export function TypingArea() {
         <TextArea
           id="typing-input"
           size="3"
-          value={inputValue}
+          value={currentInput}
           onChange={(e) => handleInputChange(e)}
           onPaste={handlePaste}
           onCut={handleCut}

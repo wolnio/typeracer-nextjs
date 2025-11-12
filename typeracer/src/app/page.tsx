@@ -6,11 +6,19 @@ import { RegisterUser } from "@/components/register-user";
 import { SentenceDisplay } from "@/components/sentence-display";
 import { Timer } from "@/components/timer";
 import { TypingArea } from "@/components/typing-area";
+import { useGame } from "@/hooks/use-game";
 import { useGameStore } from "@/utils/store";
 import { Badge, Box, Container, Flex, Grid, Text } from "@radix-ui/themes";
 
 export default function Home() {
-  const { currentPlayer } = useGameStore();
+  const {
+    currentPlayer,
+    currentRound,
+    currentInput,
+    timeRemaining,
+    setCurrentInput,
+  } = useGameStore();
+  useGame();
 
   if (!currentPlayer) {
     return <RegisterUser />;
@@ -28,7 +36,7 @@ export default function Home() {
             <Flex gap="2" align="center">
               <Text size="2">Current Round:</Text>
               <Text size="3" weight="bold">
-                #1
+                #{currentRound?.round_number}
               </Text>
             </Flex>
           </Badge>
@@ -37,7 +45,7 @@ export default function Home() {
         {/* Main Game Area */}
         <Grid columns={{ md: "2", sm: "1" }} gap="3" width="auto">
           <Flex direction="column" gapY="6">
-            <Timer />
+            <Timer timeRemaining={timeRemaining} />
             <SentenceDisplay />
             <TypingArea />
           </Flex>

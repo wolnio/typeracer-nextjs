@@ -7,10 +7,23 @@ export interface Player {
   last_seen: string;
 }
 
+export interface GameRound {
+  id: string;
+  sentence: string;
+  round_number: number;
+  started_at: string;
+  ends_at: string;
+  is_active: boolean;
+}
+
 export interface GameStore {
   currentPlayer: Player | null;
   currentInput: string;
+  currentRound: GameRound | null;
+  timeRemaining: number;
 
+  setCurrentRound: (round: GameRound | null) => void;
+  setTimeRemaining: (time: number) => void;
   setCurrentPlayer: (player: Player | null) => void;
   setCurrentInput: (input: string) => void;
 }

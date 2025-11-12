@@ -1,6 +1,13 @@
+import { formatTime } from "@/utils/utils";
 import { Card, Flex, Separator, Box, Progress, Text } from "@radix-ui/themes";
 
-export function Timer() {
+interface TimerProps {
+  timeRemaining: number;
+}
+
+export function Timer({ timeRemaining }: TimerProps) {
+  const isUrgent = timeRemaining <= 10;
+
   return (
     <Card size="3">
       <Flex direction="column" gap="6">
@@ -12,8 +19,12 @@ export function Timer() {
             >
               Time Left
             </Text>
-            <Text size="9" weight="bold" className="text-gray-900">
-              1:00
+            <Text
+              size="9"
+              weight="bold"
+              className={isUrgent ? "text-red-600" : "text-gray-900"}
+            >
+              {formatTime(timeRemaining)}
             </Text>
           </Flex>
 
