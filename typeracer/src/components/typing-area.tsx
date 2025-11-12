@@ -2,7 +2,7 @@
 
 import { useGameStore } from "@/utils/store";
 import { Card, Flex, TextArea, Text } from "@radix-ui/themes";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 interface TypingAreaProps {
   setTotalKeyStrokes: React.Dispatch<React.SetStateAction<number>>;
@@ -27,13 +27,10 @@ export function TypingArea({
     const currentValue = e.target.value;
     const previousValue = previousInputRef.current;
 
-    console.log("INPUT CHANGE", { currentValue, previousValue });
-
     if (currentValue.length > previousValue.length) {
       const index = currentValue.length - 1;
       const typedChar = currentValue[index];
       const expectedChar = currentRound?.sentence[index];
-      console.log("TYPED CHAR", { typedChar, expectedChar });
 
       if (typedChar === expectedChar) {
         setCorrectKeyStrokes((prev) => prev + 1);

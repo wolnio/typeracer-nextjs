@@ -13,49 +13,51 @@ export const useGame = () => {
 
   const startNewRound = useCallback(
     async (roundNumber: number) => {
-      console.log("Starting new round:", roundNumber);
+      try {
+        const sentence = getSentenceForRound(roundNumber);
+        const now = new Date();
+        const endsAt = new Date(now.getTime() + 60000); // 60 seconds from now
 
-      const sentence = getSentenceForRound(roundNumber);
-      const now = new Date();
-      const endsAt = new Date(now.getTime() + 60000); // 60 seconds from now
+        // Deactivate old rounds
+        const { error: deactivateError } = await supabase
+          .from("game_rounds")
+          .update({ is_active: false })
+          .eq("is_active", true);
 
-      // Deactivate old rounds
-      const { error: deactivateError } = await supabase
-        .from("game_rounds")
-        .update({ is_active: false })
-        .eq("is_active", true);
+        if (deactivateError) {
+          console.error("Error deactivating old rounds:", deactivateError);
+        }
 
-      if (deactivateError) {
-        console.error("Error deactivating old rounds:", deactivateError);
-      }
+        // Delete old sessions
+        const { error: deleteError } = await supabase
+          .from("active_sessions")
+          .delete()
+          .neq("id", "00000000-0000-0000-0000-000000000000"); // Delete all
 
-      // Delete old sessions
-      const { error: deleteError } = await supabase
-        .from("active_sessions")
-        .delete()
-        .neq("id", "00000000-0000-0000-0000-000000000000"); // Delete all
+        if (deleteError) {
+          console.error("Error deleting old sessions:", deleteError);
+        }
 
-      if (deleteError) {
-        console.error("Error deleting old sessions:", deleteError);
-      }
+        const { data: newRound } = await supabase
+          .from("game_rounds")
+          .insert([
+            {
+              sentence,
+              round_number: roundNumber,
+              started_at: now.toISOString(),
+              ends_at: endsAt.toISOString(),
+              is_active: true,
+            },
+          ])
+          .select()
+          .single();
 
-      const { data: newRound } = await supabase
-        .from("game_rounds")
-        .insert([
-          {
-            sentence,
-            round_number: roundNumber,
-            started_at: now.toISOString(),
-            ends_at: endsAt.toISOString(),
-            is_active: true,
-          },
-        ])
-        .select()
-        .single();
-
-      if (newRound) {
-        setCurrentRound(newRound as GameRound);
-        setCurrentInput("");
+        if (newRound) {
+          setCurrentRound(newRound as GameRound);
+          setCurrentInput("");
+        }
+      } catch (error) {
+        console.error("Error in startNewRound:", error);
       }
     },
     [setCurrentRound, setCurrentInput]
@@ -63,8 +65,6 @@ export const useGame = () => {
 
   //Subscribe to game round
   useEffect(() => {
-    console.log("useGame hook initialized");
-
     const fetchCurrentRound = async () => {
       const { data: currentRound } = await supabase
         .from("game_rounds")
@@ -104,7 +104,6 @@ export const useGame = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "game_rounds" },
         (payload) => {
-          console.log("Game round change received:", payload);
           if (
             payload.eventType === "INSERT" ||
             payload.eventType === "UPDATE"
@@ -120,7 +119,6 @@ export const useGame = () => {
       .subscribe();
 
     return () => {
-      console.log("Unsubscribing from game rounds channel");
       roundChannel.unsubscribe();
     };
   }, [setCurrentRound, startNewRound]);
@@ -133,8 +131,6 @@ export const useGame = () => {
       const endsAt = new Date(currentRound.ends_at).getTime();
       const now = new Date().getTime();
       const timeLeft = Math.ceil((endsAt - now) / 1000);
-
-      console.log("Time left:", timeLeft);
 
       setTimeRemaining(timeLeft);
 
@@ -156,6 +152,10 @@ export const useGame = () => {
       clearInterval(interval);
     };
   }, [currentRound, setTimeRemaining, startNewRound]);
+
+  //TODO
+  //join currnet round
+  //fetch active sessions
 
   return {};
 };
