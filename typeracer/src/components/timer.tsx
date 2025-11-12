@@ -5,17 +5,24 @@ interface TimerProps {
   timeRemaining: number;
   totalKeystrokes: number;
   correctKeystrokes: number;
+  currentSentenceLength: number;
 }
 
 export function Timer({
   timeRemaining,
   totalKeystrokes,
   correctKeystrokes,
+  currentSentenceLength,
 }: TimerProps) {
   const isUrgent = timeRemaining <= 10;
 
   const realAccuracy =
     totalKeystrokes > 0 ? correctKeystrokes / totalKeystrokes : 0;
+
+  const progressPercent = Math.min(
+    (correctKeystrokes / currentSentenceLength) * 100,
+    100
+  );
 
   return (
     <Card size="3">
@@ -73,10 +80,10 @@ export function Timer({
               Progress
             </Text>
             <Text size="1" className="text-gray-500">
-              00%
+              {Math.round(progressPercent)}%
             </Text>
           </Flex>
-          <Progress value={0} size="3" className="w-full" />
+          <Progress value={progressPercent} size="3" className="w-full" />
         </Box>
       </Flex>
     </Card>

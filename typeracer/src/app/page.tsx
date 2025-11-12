@@ -80,6 +80,7 @@ export default function Home() {
               timeRemaining={timeRemaining}
               totalKeystrokes={totalKeyStrokes}
               correctKeystrokes={correctKeyStrokes}
+              currentSentenceLength={currentRound.sentence.length}
             />
             <SentenceDisplay
               sentence={currentRound.sentence}
