@@ -1,5 +1,6 @@
 "use client";
 
+import { usePlayer } from "@/hooks/use-player";
 import {
   Button,
   Card,
@@ -14,11 +15,14 @@ import { useState } from "react";
 
 export function RegisterUser() {
   const [username, setUsername] = useState("");
+  const { createPlayer } = usePlayer();
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
     if (!username.trim()) return;
+
+    createPlayer(username.trim());
   };
 
   return (

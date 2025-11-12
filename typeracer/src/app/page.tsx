@@ -1,13 +1,18 @@
+"use client";
+
 import { LeaderboardTable } from "@/components/leaderboard-table";
 import { PersonalStats } from "@/components/personal-stats";
 import { RegisterUser } from "@/components/register-user";
 import { SentenceDisplay } from "@/components/sentence-display";
 import { Timer } from "@/components/timer";
 import { TypingArea } from "@/components/typing-area";
+import { useGameStore } from "@/utils/store";
 import { Badge, Box, Container, Flex, Grid, Text } from "@radix-ui/themes";
 
 export default function Home() {
-  if (false) {
+  const { currentPlayer } = useGameStore();
+
+  if (!currentPlayer) {
     return <RegisterUser />;
   }
 
